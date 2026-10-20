@@ -1,0 +1,33 @@
+describe("Gerenciamento de posts", () => {
+  it("Dado que existem posts cadastrados, quando eu consultar /posts, então devem ser retornados 100 posts com os campos obrigatórios", () => {
+    cy.request("/posts").then((res) => {
+      expect(res.status).to.eq(200);
+      expect(res.body).to.be.an("array").and.have.length(100);
+      expect(res.body[0]).to.have.all.keys("userId", "id", "title", "body");
+    });
+  });
+
+  it("Dado que eu tenho os dados de um novo post, quando eu enviar um POST para /posts, então o post deve ser criado com id 101", () => {
+    const novoPost = { title: "Meu post de teste", body: "Conteúdo criado via BDD", userId: 1 };
+
+    cy.request("POST", "/posts", novoPost).then((res) => {
+      expect(res.status).to.eq(201);
+      expect(res.body).to.include(novoPost);
+      expect(res.body.id).to.eq(101);
+    });
+  });
+
+  it("Dado que eu tenho os dados completos do post 1, quando eu enviar um PUT para /posts/1, então o post deve ser substituído", () => {
+    const postAtualizado = { id: 1, title: "Título atualizado", body: "Corpo atualizado", userId: 1 };
+
+    cy.request("PUT", "/posts/1", postAtualizado).then((res) => {
+      expect(res.status).to.eq(200);
+      expect(res.body).to.deep.equal(postAtualizado);
+    });
+  });
+
+  it("Dado que o post 1 existe, quando eu enviar um DELETE para /posts/1, então deve ser retornado status 200 com corpo vazio", () => {
+    cy.request("DELETE", "/posts/1").then((res) => {
+      expect(res.status).to.eq(200);
+      expect(res.body).to.deep.equal({});
+    });
