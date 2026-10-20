@@ -31,3 +31,24 @@ describe("Gerenciamento de usuários", () => {
 
     cy.request("POST", "/users", novoUsuario).then((res) => {
       expect(res.status).to.eq(201);
+      expect(res.body).to.include(novoUsuario);
+      expect(res.body.id).to.eq(11);
+    });
+  });
+
+  it("Dado que eu tenho os dados completos do usuário 1, quando eu enviar um PUT para /users/1, então o usuário deve ser substituído", () => {
+    const usuarioAtualizado = { id: 1, name: "Nome atualizado", username: "usuarioatualizado", email: "atualizado@email.com" };
+
+    cy.request("PUT", "/users/1", usuarioAtualizado).then((res) => {
+      expect(res.status).to.eq(200);
+      expect(res.body).to.deep.equal(usuarioAtualizado);
+    });
+  });
+
+  it("Dado que o usuário 1 existe, quando eu enviar um DELETE para /users/1, então deve ser retornado status 200 com corpo vazio", () => {
+    cy.request("DELETE", "/users/1").then((res) => {
+      expect(res.status).to.eq(200);
+      expect(res.body).to.deep.equal({});
+    });
+  });
+});
