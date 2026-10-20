@@ -1,0 +1,33 @@
+describe("Gerenciamento de comentários", () => {
+  it("Dado que existem comentários cadastrados, quando eu consultar /comments, então devem ser retornados 500 comentários com os campos obrigatórios", () => {
+    cy.request("/comments").then((res) => {
+      expect(res.status).to.eq(200);
+      expect(res.body).to.be.an("array").and.have.length(500);
+      expect(res.body[0]).to.have.all.keys("postId", "id", "name", "email", "body");
+    });
+  });
+
+  it("Dado que o comentário 1 existe, quando eu consultar /comments/1, então deve ser retornado o comentário com id 1", () => {
+    cy.request("/comments/1").then((res) => {
+      expect(res.status).to.eq(200);
+      expect(res.body.id).to.eq(1);
+    });
+  });
+
+  it("Dado que o comentário 0 não existe, quando eu consultar /comments/0, então deve retornar status 404", () => {
+    cy.request({ url: "/comments/0", failOnStatusCode: false }).then((res) => {
+      expect(res.status).to.eq(404);
+    });
+  });
+
+  it("Dado que o id tem letra, quando eu consultar /comments/abc, então deve retornar status 404", () => {
+    cy.request({ url: "/comments/abc", failOnStatusCode: false }).then((res) => {
+      expect(res.status).to.eq(404);
+    });
+  });
+
+  it("Dado que existem comentários do post 1, quando eu consultar /comments?postId=1, então devem ser retornados 5 comentários desse post", () => {
+    cy.request("/comments?postId=1").then((res) => {
+      expect(res.status).to.eq(200);
+      expect(res.body).to.be.an("array").and.have.length(5);
+      expect(res.body[0].postId).to.eq(1);
