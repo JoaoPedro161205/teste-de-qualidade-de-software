@@ -31,3 +31,32 @@ describe("Gerenciamento de comentários", () => {
       expect(res.status).to.eq(200);
       expect(res.body).to.be.an("array").and.have.length(5);
       expect(res.body[0].postId).to.eq(1);
+    });
+  });
+
+  it("Dado que eu tenho os dados de um novo comentário, quando eu enviar um POST para /comments, então o comentário deve ser criado com id 501", () => {
+    const novoComentario = { postId: 1, name: "Comentário de teste", email: "joao@email.com", body: "Conteúdo do comentário" };
+
+    cy.request("POST", "/comments", novoComentario).then((res) => {
+      expect(res.status).to.eq(201);
+      expect(res.body).to.include(novoComentario);
+      expect(res.body.id).to.eq(501);
+    });
+  });
+
+  it("Dado que eu tenho os dados completos do comentário 1, quando eu enviar um PUT para /comments/1, então o comentário deve ser substituído", () => {
+    const comentarioAtualizado = { id: 1, postId: 1, name: "Nome atualizado", email: "atualizado@email.com", body: "Corpo atualizado" };
+
+    cy.request("PUT", "/comments/1", comentarioAtualizado).then((res) => {
+      expect(res.status).to.eq(200);
+      expect(res.body).to.deep.equal(comentarioAtualizado);
+    });
+  });
+
+  it("Dado que o comentário 1 existe, quando eu enviar um DELETE para /comments/1, então deve ser retornado status 200 com corpo vazio", () => {
+    cy.request("DELETE", "/comments/1").then((res) => {
+      expect(res.status).to.eq(200);
+      expect(res.body).to.deep.equal({});
+    });
+  });
+});
